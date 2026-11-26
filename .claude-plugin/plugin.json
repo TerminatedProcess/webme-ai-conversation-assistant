@@ -1,10 +1,20 @@
 {
   "name": "webme",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Live, auto-refreshing local web pages that summarize your AI coding conversation: current state, decisions, numbers, open questions, charts. Updated every turn with arrows on what changed.",
-  "author": { "name": "TerminatedProcess", "url": "https://github.com/TerminatedProcess" },
+  "author": {
+    "name": "TerminatedProcess",
+    "url": "https://github.com/TerminatedProcess"
+  },
   "homepage": "https://github.com/TerminatedProcess/webme-ai-conversation-assistant",
   "repository": "https://github.com/TerminatedProcess/webme-ai-conversation-assistant",
   "license": "MIT",
-  "keywords": ["skill", "summary", "conversation", "html", "dashboard", "notes"]
+  "keywords": [
+    "skill",
+    "summary",
+    "conversation",
+    "html",
+    "dashboard",
+    "notes"
+  ]
 }

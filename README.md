@@ -74,7 +74,9 @@ Just ask. In Claude Code you can also run the command directly: `/webme:webme`
 | *(later, same chat)* `add 2021 to the tax list` | The existing list page is updated, with arrows on the new rows |
 
 **The first time** the skill runs on a machine, it asks whether to use your
-**default browser or a specific one**, and remembers the answer.
+**default browser or a specific one**, and remembers the answer. Pages open in
+a **new browser window**, so they appear on the workspace / virtual desktop
+you're working on, not wherever your browser's other window happens to be.
 
 ## How it works
 
@@ -144,7 +146,9 @@ Each page is a self-contained file with no network requests.
 .claude-plugin/
   plugin.json            # Claude Code plugin manifest
   marketplace.json       # lets this repo act as its own plugin marketplace
-skills/webme/SKILL.md    # the skill: the instructions the agent follows
+skills/webme/
+  SKILL.md               # the skill: the instructions the agent follows
+  scripts/open-page.sh   # opens a page in a new window (Linux, macOS, Windows)
 hooks/
   hooks.json             # registers the session-start hook (Claude Code)
   webme-session-start.sh # cleanup on startup/clear; reopen + remind on resume/compact

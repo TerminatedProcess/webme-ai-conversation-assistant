@@ -14,14 +14,6 @@ case "$source" in
   resume|compact) ;;
   *) exit 0 ;;
 esac
-browser=$(head -1 "$HOME/webme/.browser" 2>/dev/null); browser=${browser:-default}
-open_page() {  # $1 = page path. Works on Linux, macOS, Windows (Git Bash).
-  case "$(uname -s)" in
-    Darwin) if [[ $browser == default ]]; then open "$1"; else open -a "$browser" "$1"; fi ;;
-    MINGW*|MSYS*|CYGWIN*) if [[ $browser == default ]]; then cmd.exe //c start "" "$1"; else "$browser" "$1" & fi ;;
-    *) if [[ $browser == default ]]; then setsid xdg-open "file://$1" >/dev/null 2>&1 & else setsid $browser "file://$1" >/dev/null 2>&1 & fi ;;
-  esac
-}
 [[ -f "$transcript" ]] || exit 0
 
 # Every .html file this conversation wrote/edited that still carries the webme marker, newest first.
@@ -38,7 +30,7 @@ for p in "${pages[@]}"; do
   purpose=$(grep -o 'name="webme-purpose" content="[^"]*"' "$p" | sed 's/.*content="//; s/"$//')
   list+="- $p [$kind]${purpose:+ — $purpose}"$'\n'
   if [[ "$source" == resume && "$kind" == living ]]; then
-    open_page "$p"
+    bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/webme/scripts/open-page.sh" "$p"
   fi
 done
 

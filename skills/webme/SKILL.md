@@ -61,13 +61,18 @@ check the page. After the first run, never ask again; read the file. The
 user changes it by saying so, and then you rewrite the file. The resume hook
 reads the same file.
 
-Open each page **once** (it refreshes itself; never re-open it):
+Open each page **once** (it refreshes itself; never re-open it) with the
+script that ships next to this file:
 
-| OS | default | specific browser |
-|---|---|---|
-| Linux | `setsid xdg-open "file://<file>" >/dev/null 2>&1 &` | `setsid <command> "file://<file>" >/dev/null 2>&1 &` |
-| macOS | `open "<file>"` | `open -a "<App name>" "<file>"` |
-| Windows (Git Bash) | `cmd.exe //c start "" "<file>"` | `"<path to browser.exe>" "<file>" &` |
+```bash
+bash <this skill's folder>/scripts/open-page.sh <file>
+```
+
+It reads `~/webme/.browser` and opens the page in a **new window**, so the
+page appears on the workspace / virtual desktop the user is on (a new tab
+would join the browser's existing window, wherever that is). It handles
+Linux, macOS and Windows (Git Bash), and finds the executable of the default
+browser so that one gets a new window too.
 
 Never kill a running browser to open a page. A tab the user opened is outside
 Claude's tab group, so Claude can't see or switch to it.
