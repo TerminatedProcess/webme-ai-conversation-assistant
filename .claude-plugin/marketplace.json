@@ -1,0 +1,15 @@
+{
+  "name": "webme-ai-conversation-assistant",
+  "owner": {
+    "name": "TerminatedProcess",
+    "url": "https://github.com/TerminatedProcess"
+  },
+  "plugins": [
+    {
+      "name": "webme",
+      "source": "./",
+      "description": "Live, auto-refreshing local web pages that summarize your AI coding conversation."
+    }
+  ],
+  "description": "webme: live web pages that summarize your AI coding conversation, updated every turn."
+}

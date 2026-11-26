@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="webme" content="active">
+<meta name="webme-purpose" content="Running summary: choosing a home NAS">
+<meta name="webme-kind" content="living">
+<meta http-equiv="refresh" content="15">
+<title>Home NAS: decision summary</title>
+<style>
+  body{font:18px/1.5 system-ui,sans-serif;color:#1a1a1a;background:#fafaf7;max-width:960px;margin:2rem auto;padding:0 1rem}
+  h1{font-size:1.6rem;margin-bottom:.2rem} h2{margin-top:2rem;border-bottom:2px solid #ddd;padding-bottom:.2rem}
+  .muted{color:#666;font-size:.9rem}
+  .alert{background:#fff4e6;border-left:6px solid #e67700;padding:.8rem 1rem;margin:1rem 0}
+  .rec{background:#ebfbee;border-left:6px solid #2b8a3e;padding:.8rem 1rem;margin:1rem 0}
+  .tbd{color:#d9480f;font-weight:bold}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  table{border-collapse:collapse;width:100%;margin:.6rem 0} th,td{border:1px solid #ddd;padding:.4rem .6rem;vertical-align:top} th{background:#f1f3f5;text-align:left}
+  tr.total td{font-weight:bold;background:#f8f9fa}
+  .chg:not(tr)::before,tr.chg>:first-child::before{content:"➜ ";color:#e67700;font-weight:bold;font-size:1.3em}
+</style>
+</head>
+<body>
+<h1>Home NAS: decision summary</h1>
+<p class="muted">Family photo + backup storage, ~4 TB today, growing ~1 TB/year · Last updated 2026-11-26 14:05</p>
+
+<div class="alert chg"><strong>⚠ Don't get this wrong:</strong> RAID is not a backup. Whatever you buy, keep one off-site copy (cloud or a drive at a relative's).</div>
+
+<div class="rec">
+<h3 style="margin-top:0">Current recommendation</h3>
+<ul>
+<li><strong>2-bay box, 2 × 8 TB mirrored</strong>: 8 TB usable covers ~4 years of growth.</li>
+<li class="chg"><strong>Off-site: cloud backup of the photos folder only</strong>: about 1.5 TB, cheapest tier is enough.</li>
+<li><strong>Skip the 4-bay</strong>: extra cost isn't justified until you pass 8 TB.</li>
+</ul>
+</div>
+
+<h2>Cost, first year</h2>
+<table>
+<tr><th>Item</th><th class="num">2-bay</th><th class="num">4-bay</th></tr>
+<tr><td>Enclosure</td><td class="num">$300</td><td class="num">$550</td></tr>
+<tr><td>Drives</td><td class="num">$320</td><td class="num">$480</td></tr>
+<tr class="chg"><td>Off-site backup (12 mo)</td><td class="num">$84</td><td class="num">$84</td></tr>
+<tr class="total"><td>Total</td><td class="num">$704</td><td class="num">$1,114</td></tr>
+</table>
+
+<svg width="520" height="110" role="img" aria-label="First-year total: 2-bay $704, 4-bay $1,114">
+  <text x="0" y="30" font-size="15">2-bay</text>
+  <rect x="70" y="14" width="221" height="24" fill="#2b8a3e"/><text x="298" y="31" font-size="15">$704</text>
+  <text x="0" y="80" font-size="15">4-bay</text>
+  <rect x="70" y="64" width="350" height="24" fill="#868e96"/><text x="427" y="81" font-size="15">$1,114</text>
+</svg>
+
+<h2>Open questions</h2>
+<ul>
+<li class="tbd">Does the TV need to stream 4K from it? (decides CPU model)</li>
+<li class="tbd">Who else needs remote access?</li>
+</ul>
+
+<h2>Decision log</h2>
+<ul>
+<li>14:05: Off-site copy limited to photos (other data is replaceable).</li>
+<li>13:40: Mirrored 2-bay over 4-bay.</li>
+<li>13:20: Ruled out USB drives: no redundancy.</li>
+</ul>
+
+<h2>Sources</h2>
+<p class="muted">Example page. Prices are illustrative, not real quotes.</p>
+</body>
+</html>
