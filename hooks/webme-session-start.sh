@@ -46,10 +46,9 @@ for p in "${pages[@]}"; do
   kind=$(grep -o 'name="webme-kind" content="[a-z]*"' "$p" | sed 's/.*content="//; s/"//'); kind=${kind:-living}
   purpose=$(grep -o 'name="webme-purpose" content="[^"]*"' "$p" | sed 's/.*content="//; s/"$//')
   list+="- $p [$kind]${purpose:+ — $purpose}"$'\n'
-  if [[ "$source" == resume ]]; then
-    bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/webme/scripts/open-page.sh" "$p"
-  fi
 done
+# All pages in one new window, one tab each.
+[[ "$source" == resume ]] && bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/webme/scripts/open-page.sh" "${pages[@]}"
 
 jq -n --arg l "$list" --arg n "$note" '{
   hookSpecificOutput: {

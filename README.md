@@ -76,7 +76,7 @@ Just ask. In Claude Code you can also run the command directly: `/webme:webme`
 
 **The first time** the skill runs on a machine, it asks whether to use your
 **default browser or a specific one**, and remembers the answer. Pages open in
-a **new browser window**, so they appear on the workspace / virtual desktop
+a **new browser window** (several at once share it, one tab each), so they appear on the workspace / virtual desktop
 you're working on, not wherever your browser's other window happens to be.
 
 ## How it works

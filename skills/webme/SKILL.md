@@ -65,14 +65,16 @@ Open each page **once** (it refreshes itself; never re-open it) with the
 script that ships next to this file:
 
 ```bash
-bash <this skill's folder>/scripts/open-page.sh <file>
+bash <this skill's folder>/scripts/open-page.sh <file> [<file> ...]
 ```
 
-It reads `~/webme/.browser` and opens the page in a **new window**, so the
+It reads `~/webme/.browser` and opens the pages in **one new window**, so the
 page appears on the workspace / virtual desktop the user is on (a new tab
 would join the browser's existing window, wherever that is). It handles
 Linux, macOS and Windows (Git Bash), and finds the executable of the default
-browser so that one gets a new window too.
+browser so that one gets a new window too. **Several pages at once (e.g. a
+request that creates more than one): pass them all in one call**, so they
+become tabs of the same new window instead of one window each.
 
 Never kill a running browser to open a page. A tab the user opened is outside
 Claude's tab group, so Claude can't see or switch to it.
