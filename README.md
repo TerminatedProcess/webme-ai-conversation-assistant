@@ -94,8 +94,16 @@ list** in `~/webme/.open/<project-key>.txt`, one page path per line. On
 startup and resume the hook reopens exactly the pages on that list (lines for
 files that no longer exist are dropped), and the agent keeps those pages in
 sync. **Retiring** a page removes its line: it stops reopening, but the file
-stays on disk. **Cleanup** deletes the files of retired pages, only when you
-ask and confirm. Lists from before 1.3.0 (one per conversation) are merged
+stays on disk and moves to the project's retired list. **Cleanup** deletes the
+files of retired pages, only when you ask and confirm.
+
+### Index page
+
+When a project has two or more active pages, the first tab is an **index**:
+two lists, **Active** and **Retired**, one link per page with its purpose,
+kind and when it last changed. The index opens the pages itself, so clicking
+a link switches to that page's tab, or reopens it if you closed it. It
+refreshes every 15 seconds and opens newly added pages on its own. Lists from before 1.3.0 (one per conversation) are merged
 into the project list on resume.
 
 ### Living pages and snapshot pages
@@ -161,6 +169,7 @@ Each page is a self-contained file with no network requests.
 skills/webme/
   SKILL.md               # the skill: the instructions the agent follows
   scripts/open-page.sh   # opens a page in a new window (Linux, macOS, Windows)
+  scripts/make-index.sh  # builds the index page (Active + Retired lists)
 hooks/
   hooks.json             # registers the session-start hook (Claude Code)
   webme-session-start.sh # cleanup on startup/clear; reopen + remind on resume/compact

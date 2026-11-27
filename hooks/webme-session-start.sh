@@ -3,8 +3,11 @@
 # Pages belong to a PROJECT (the directory Claude Code started in), not to one conversation.
 # Open list: ~/webme/.open/<project-key>.txt, one absolute page path per line; key = the directory with
 # every character outside [A-Za-z0-9._-] turned into "_".
-# Retire = remove the line; the file stays. Nothing is ever deleted or expired by this hook.
-# startup / resume → reopen every page on the list (one new window, one tab each) and remind Claude.
+# Retire = move the line to the retired list; the file stays. Nothing is ever deleted or expired by this hook.
+# Retired list: <key>.retired.txt next to it. Index page (Active + Retired): ~/webme/.index/<key>.html,
+# rebuilt on every event by scripts/make-index.sh.
+# startup / resume → reopen: one active page → that page; two or more → the index, which opens the
+#                    pages itself as tabs (so its links switch to them). Then remind Claude.
 # clear / compact  → remind only (the pages are still open in the browser).
 command -v jq >/dev/null || exit 0          # needs jq; without it, do nothing
 [[ "$CLAUDE_CODE_REMOTE" == "true" ]] && exit 0   # cloud session: no local browser
@@ -39,12 +42,15 @@ for p in "${pages[@]}"; do
   purpose=$(grep -o 'name="webme-purpose" content="[^"]*"' "$p" | sed 's/.*content="//; s/"$//')
   list+="- $p [$kind]${purpose:+ — $purpose}"$'\n'
 done
-# All pages in one new window, one tab each.
-[[ "$source" == startup || "$source" == resume ]] && bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/webme/scripts/open-page.sh" "${pages[@]}"
+scripts="${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/webme/scripts"
+index=$(bash "$scripts/make-index.sh" "$openlist")
+if [[ "$source" == startup || "$source" == resume ]]; then
+  if (( ${#pages[@]} > 1 )); then bash "$scripts/open-page.sh" "$index"; else bash "$scripts/open-page.sh" "${pages[0]}"; fi
+fi
 
-jq -n --arg l "$list" --arg f "$openlist" '{
+jq -n --arg l "$list" --arg f "$openlist" --arg i "$index" --arg s "$scripts" '{
   hookSpecificOutput: {
     hookEventName: "SessionStart",
-    additionalContext: ("webme is ACTIVE for this project. Pages (already open in the browser; do not reopen):\n" + $l + "Open list: " + $f + " (new page = append its path; retire = remove the line, never delete the file).\nThese pages carry over across /clear and new conversations: continue them. Keep living pages updated every turn per the webme skill (clear old chg markers, mark new changes with class chg); keep all pages on the list in sync: when data changes, update every page that shows it, snapshots included. For a new webme request, decide per the skill whether it adds to one of these or starts a new page.")
+    additionalContext: ("webme is ACTIVE for this project. Pages (already open in the browser; do not reopen):\n" + $l + "Open list: " + $f + " (new page = append its path; retire = move the line to the .retired.txt list next to it, never delete the file). After any list change run: bash " + $s + "/make-index.sh " + $f + " (rebuilds the index page " + $i + ").\nThese pages carry over across /clear and new conversations: continue them. Keep living pages updated every turn per the webme skill (clear old chg markers, mark new changes with class chg); keep all pages on the list in sync: when data changes, update every page that shows it, snapshots included. For a new webme request, decide per the skill whether it adds to one of these or starts a new page.")
   }
 }'

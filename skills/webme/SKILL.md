@@ -94,8 +94,13 @@ Claude's tab group, so Claude can't see or switch to it.
    - `<meta http-equiv="refresh" content="15">`.
 3. **Build it from the whole conversation so far** (living), or from the
    data the request names (snapshot).
-4. **Open it once** in the saved browser (table above).
-5. **Add it to the open list** (next section).
+4. **Add it to the open list** and rebuild the index (next section).
+5. **Open it once**, by the number of active pages on the list now:
+   - **1:** open the page itself.
+   - **2:** open the **index page** (it opens both pages as tabs).
+   - **3 or more:** open nothing. The index is already open and opens the
+     new page itself on its next refresh (≤15 s). If the user says it didn't
+     appear (they closed the index), open the index.
 
 ## The open list: which pages are live
 
@@ -111,6 +116,18 @@ otherwise compute it (run from the start directory):
 f=~/webme/.open/$(pwd | tr -c 'A-Za-z0-9._-' _).txt
 ```
 
+Next to it, **`${f%.txt}.retired.txt`** lists retired pages the same way.
+
+**Index page.** `~/webme/.index/<key>.html` shows every page of the project
+in two lists, **Active** and **Retired**, each a link. It is the first tab
+whenever two or more pages are active: it opens the active pages itself, so
+clicking a link switches to that page's tab, or reopens it if the user closed
+it. **After every change to either list, rebuild it** (it prints its path):
+
+```bash
+bash <this skill's folder>/scripts/make-index.sh "$f"
+```
+
 - **Creating a page:** append its absolute path (no duplicates; create the
   dir/file if missing):
   ```bash
@@ -123,14 +140,16 @@ f=~/webme/.open/$(pwd | tr -c 'A-Za-z0-9._-' _).txt
 (`$f` = the list path, above.)
 
 - **Retire** ("retire / close / drop / stop showing that page", "I read it"):
-  remove its line only. The file stays on disk. **Never delete a page unless
-  the user explicitly asks** (delete, or a cleanup).
+  move its line to the retired list. The file stays on disk. **Never delete a
+  page unless the user explicitly asks** (delete, or a cleanup).
   ```bash
-  p=/abs/path/webme-x.html; grep -vxF "$p" "$f" > "$f.tmp"; mv "$f.tmp" "$f"
+  p=/abs/path/webme-x.html; grep -vxF "$p" "$f" > "$f.tmp"; mv "$f.tmp" "$f"; r=${f%.txt}.retired.txt; grep -qxF "$p" "$r" 2>/dev/null || echo "$p" >> "$r"
   ```
-- **Cleanup** ("clean up webme", "delete retired pages"): the retired pages
-  are `~/webme/webme-*.html` files on no list in `~/webme/.open/`. Show them,
-  delete only after the user confirms.
+- **Unretire** ("bring back …"): the reverse; move the line back to `$f`.
+- **Cleanup** ("clean up webme", "delete retired pages"): list the files on
+  the retired list, delete them only after the user confirms, then empty the
+  retired list. Never touch active pages.
+- Rebuild the index after each of these.
 
 ## Checking a page yourself (screenshot)
 
