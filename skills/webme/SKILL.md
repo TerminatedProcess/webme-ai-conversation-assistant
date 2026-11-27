@@ -121,7 +121,7 @@ The session-start hook (`hooks/webme-session-start.sh`, installed with the
 Claude Code plugin; other agents can run it from their own session-start
 hook, or go without it):
 - **startup / clear:** deletes `~/webme/webme-*.html` older than 14 days. Nothing else.
-- **resume:** reopens this conversation's living pages in the saved
+- **resume:** reopens all of this conversation's pages (living and snapshot) in the saved
   browser and injects "webme is ACTIVE, pages: …".
 - **compact:** injects the same reminder only; the pages are already open.
 

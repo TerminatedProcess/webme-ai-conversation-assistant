@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SessionStart hook for the `webme` skill (https://github.com/TerminatedProcess/webme-ai-conversation-assistant).
-# resume  → reopen the conversation's living webme pages and remind Claude to keep them updated.
+# resume  → reopen all of the conversation's webme pages (living and snapshot) and remind Claude to keep them updated.
 # compact → remind only (pages are already open).
 # startup / clear → new conversation; webme is off. Only prunes pages in ~/webme older than 14 days.
 command -v jq >/dev/null || exit 0          # needs jq; without it, do nothing
@@ -29,7 +29,7 @@ for p in "${pages[@]}"; do
   kind=$(grep -o 'name="webme-kind" content="[a-z]*"' "$p" | sed 's/.*content="//; s/"//'); kind=${kind:-living}
   purpose=$(grep -o 'name="webme-purpose" content="[^"]*"' "$p" | sed 's/.*content="//; s/"$//')
   list+="- $p [$kind]${purpose:+ — $purpose}"$'\n'
-  if [[ "$source" == resume && "$kind" == living ]]; then
+  if [[ "$source" == resume ]]; then
     bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/skills/webme/scripts/open-page.sh" "$p"
   fi
 done
