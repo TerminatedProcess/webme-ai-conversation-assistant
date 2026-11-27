@@ -1,6 +1,6 @@
 {
   "name": "webme",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Live, auto-refreshing local web pages that summarize your AI coding conversation: current state, decisions, numbers, open questions, charts. Updated every turn with arrows on what changed.",
   "author": {
     "name": "TerminatedProcess",

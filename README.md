@@ -48,18 +48,17 @@ claude plugin install webme@webme-ai-conversation-assistant
 ```
 
 This installs the skill **and** a small session-start hook that:
-- reopens the pages on the conversation's open list and reminds the agent about them when you resume a conversation or it gets compacted, and
-- deletes pages (and open lists) that haven't changed for 14 days.
+- reopens the project's pages (one window, one tab each) when you start or resume Claude Code, and
+- reminds the agent about them after `/clear` or compaction, so it keeps them going.
 
 ### Other coding agents (Codex, Cursor, Gemini CLI, …)
 
 The skill is a standard [Agent Skill](https://agentskills.io): a folder with a
 `SKILL.md` file. Copy [`skills/webme/`](skills/webme) into your agent's skills
 directory. The pages work the same. Without the hook you don't get auto-reopen
-on resume or the 14-day cleanup. You can wire
+or the reminder. You can wire
 [`hooks/webme-session-start.sh`](hooks/webme-session-start.sh) into your
-agent's own session-start hook if it has one, or delete old pages from
-`~/webme/` yourself.
+agent's own session-start hook if it has one.
 
 ## Use it
 
@@ -72,7 +71,8 @@ Just ask. In Claude Code you can also run the command directly: `/webme:webme`
 | `webme: pie chart of the budget allocation` | A separate chart page. It's redrawn when the numbers change. |
 | `webme: list the tax documents for 2022–2024` | A separate document-list page |
 | *(later, same chat)* `add 2021 to the tax list` | The existing list page is updated, with arrows on the new rows |
-| `webme: retire the cost chart` | Stops reopening it; the file stays until it expires |
+| `webme: retire the cost chart` | Stops reopening it; the file stays |
+| `webme: clean up` | Deletes retired pages' files, after you confirm |
 
 **The first time** the skill runs on a machine, it asks whether to use your
 **default browser or a specific one**, and remembers the answer. Pages open in
@@ -89,12 +89,14 @@ committed by accident. Your browser choice is saved in `~/webme/.browser`.
 
 ### Open list and retiring a page
 
-Each conversation keeps an **open list** in `~/webme/.open/<session-id>.txt`,
-one page path per line. On resume the hook reopens exactly the pages on that
-list (lines for files that no longer exist are dropped), and the agent keeps
-only those pages in sync. **Retiring** a page removes its line: it stops
-reopening, but the file stays on disk until the 14-day expiry. Conversations
-from before 1.1.0 have no list; the hook falls back to scanning the transcript.
+Each **project** (the directory you start Claude Code in) keeps an **open
+list** in `~/webme/.open/<project-key>.txt`, one page path per line. On
+startup and resume the hook reopens exactly the pages on that list (lines for
+files that no longer exist are dropped), and the agent keeps those pages in
+sync. **Retiring** a page removes its line: it stops reopening, but the file
+stays on disk. **Cleanup** deletes the files of retired pages, only when you
+ask and confirm. Lists from before 1.3.0 (one per conversation) are merged
+into the project list on resume.
 
 ### Living pages and snapshot pages
 
@@ -108,10 +110,10 @@ the agent matches later requests to the right page.
 
 ### Lifetime
 
-- A page stays active for the **whole conversation**.
-- **`/clear` or a new conversation ends the topic.** Old pages are never edited
-  again. If you want one back, the agent builds a new page from it.
-- Pages and open lists expire **14 days** after their last change (the hook deletes them).
+- Pages belong to the **project**, not the conversation: they carry over
+  across `/clear`, restarts and new conversations, and the agent keeps
+  updating them.
+- A page stays until you **retire** it. Nothing expires.
 
 ### What a summary page contains
 

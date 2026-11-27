@@ -25,18 +25,18 @@ keep the summary in chat instead.
 All pages go in **`~/webme/`** (Windows: `%USERPROFILE%\webme`), one folder for
 every project, named `webme-<topic>-<purpose>.html`, a short kebab slug (e.g.
 `webme-hostlore-ui.html`, `webme-taxes-allocation-pie.html`). It's outside
-every repo, so pages never get committed. **Retention: 14 days.** The
-SessionStart hook deletes pages not modified for 14 days, on every startup
-and `/clear` (Claude Code; without the hook, delete old pages yourself).
+every repo, so pages never get committed. **Pages never expire.** A page
+stays until the user retires it (stops showing) or asks for a cleanup
+(deletes files); see "The open list".
 
 ## Each request: add to a page, or start a new one?
 
-**`/clear` ends the topic.** Pages from before a `/clear` or from an earlier
-conversation are finished: never edit them. If the user wants one back, build
-a new page from it.
+**Pages belong to the project, not the conversation.** Users `/clear` often
+while staying on the same work, so pages on the project's open list carry
+over across `/clear` and new conversations: keep them and continue them.
 
-Within this conversation, decide yourself; don't ask. Match the request
-against the **purpose** of each page this conversation made, not just its topic:
+Decide yourself; don't ask. Match the request against the **purpose** of each
+page on the open list, not just its topic:
 - **Same purpose → add to that page.** More facts for a running summary, one
   more slice on an existing chart, more years on an existing document list.
 - **Different purpose → new page**, even if the topic is the same. "Summarize
@@ -99,29 +99,38 @@ Claude's tab group, so Claude can't see or switch to it.
 
 ## The open list: which pages are live
 
-Each conversation has an **open list**, `~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt`:
-one absolute page path per line. It decides which pages the resume hook
-reopens and which pages you keep in sync. (`$CLAUDE_CODE_SESSION_ID` is set in
-Claude's Bash tool.)
+Each **project** has an **open list**: one absolute page path per line. It
+decides which pages the hook reopens and which pages you keep in sync. The
+project is the directory Claude Code was started in (your working directory
+at session start, not a later `cd`). Its list file is
+`~/webme/.open/<key>.txt`, key = that directory with every character outside
+`A-Za-z0-9._-` turned into `_`. The hook's reminder gives the exact path;
+otherwise compute it (run from the start directory):
+
+```bash
+f=~/webme/.open/$(pwd | tr -c 'A-Za-z0-9._-' _).txt
+```
 
 - **Creating a page:** append its absolute path (no duplicates; create the
   dir/file if missing):
   ```bash
-  f=~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt; p=/abs/path/webme-x.html; mkdir -p "${f%/*}"; grep -qxF "$p" "$f" 2>/dev/null || echo "$p" >> "$f"
+  p=/abs/path/webme-x.html; mkdir -p "${f%/*}"; grep -qxF "$p" "$f" 2>/dev/null || echo "$p" >> "$f"
   ```
 - **Renaming a page:** after `mv`, replace its line:
   ```bash
-  f=~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt; sed -i.bak "s|^$old\$|$new|" "$f" && rm -f "$f.bak"   # $old, $new = absolute paths
+  sed -i.bak "s|^$old\$|$new|" "$f" && rm -f "$f.bak"   # $old, $new = absolute paths
   ```
+(`$f` = the list path, above.)
+
 - **Retire** ("retire / close / drop / stop showing that page", "I read it"):
-  remove its line only. The file stays on disk and still expires with the
-  14-day retention. **Never delete a page unless the user explicitly says
-  delete.**
+  remove its line only. The file stays on disk. **Never delete a page unless
+  the user explicitly asks** (delete, or a cleanup).
   ```bash
-  f=~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt; p=/abs/path/webme-x.html; grep -vxF "$p" "$f" > "$f.tmp"; mv "$f.tmp" "$f"
+  p=/abs/path/webme-x.html; grep -vxF "$p" "$f" > "$f.tmp"; mv "$f.tmp" "$f"
   ```
-- Conversations from before 1.1.0 have no list; the hook then scans the
-  transcript. Create the list the first time you touch a page.
+- **Cleanup** ("clean up webme", "delete retired pages"): the retired pages
+  are `~/webme/webme-*.html` files on no list in `~/webme/.open/`. Show them,
+  delete only after the user confirms.
 
 ## Checking a page yourself (screenshot)
 
@@ -140,18 +149,19 @@ Do this after big layout changes (new charts or diagrams), not every turn.
 
 ## Lifetime
 
-webme stays on for the **whole conversation**. `/clear` or a fresh
-conversation ends it: off until the user asks again, and old pages are not
-continued (they expire after 14 days).
+webme pages live as long as they're on the project's open list: across
+`/clear`, restarts and new conversations, until the user retires them.
 
 The session-start hook (`hooks/webme-session-start.sh`, installed with the
 Claude Code plugin; other agents can run it from their own session-start
 hook, or go without it):
-- **startup / clear:** deletes `~/webme/webme-*.html` and `~/webme/.open/*.txt` older than 14 days. Nothing else.
-- **resume:** reopens every page on this conversation's open list (living and snapshot) in the saved
-  browser and injects "webme is ACTIVE, pages: …" plus the open-list path.
-  Lines whose files no longer exist are dropped from the list.
-- **compact:** injects the same reminder only; the pages are already open.
+- **startup / resume:** reopens every page on the project's open list
+  (living and snapshot) in one new window, one tab each, and injects
+  "webme is ACTIVE, pages: …" plus the open-list path.
+- **clear / compact:** injects the same reminder only; the pages are still open.
+- Lines whose files no longer exist are dropped from the list. Nothing is
+  deleted or expired. A pre-1.3.0 per-conversation list is merged into the
+  project list on resume.
 
 So when you see that reminder, keep updating those pages and don't reopen
 them. No memory file is needed.

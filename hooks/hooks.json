@@ -1,5 +1,5 @@
 {
-  "description": "webme: prune pages older than 14 days on startup/clear; reopen and re-announce this conversation's pages on resume/compact.",
+  "description": "webme: reopen the project's pages on startup/resume; re-announce them on clear/compact.",
   "hooks": {
     "SessionStart": [
       {
