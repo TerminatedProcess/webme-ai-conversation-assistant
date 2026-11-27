@@ -48,8 +48,8 @@ claude plugin install webme@webme-ai-conversation-assistant
 ```
 
 This installs the skill **and** a small session-start hook that:
-- reopens your pages and reminds the agent about them when you resume a conversation or it gets compacted, and
-- deletes pages that haven't changed for 14 days.
+- reopens the pages on the conversation's open list and reminds the agent about them when you resume a conversation or it gets compacted, and
+- deletes pages (and open lists) that haven't changed for 14 days.
 
 ### Other coding agents (Codex, Cursor, Gemini CLI, …)
 
@@ -72,6 +72,7 @@ Just ask. In Claude Code you can also run the command directly: `/webme:webme`
 | `webme: pie chart of the budget allocation` | A separate chart page. It's redrawn when the numbers change. |
 | `webme: list the tax documents for 2022–2024` | A separate document-list page |
 | *(later, same chat)* `add 2021 to the tax list` | The existing list page is updated, with arrows on the new rows |
+| `webme: retire the cost chart` | Stops reopening it; the file stays until it expires |
 
 **The first time** the skill runs on a machine, it asks whether to use your
 **default browser or a specific one**, and remembers the answer. Pages open in
@@ -85,6 +86,15 @@ you're working on, not wherever your browser's other window happens to be.
 All pages go to **`~/webme/`** (Windows: `%USERPROFILE%\webme`), named
 `webme-<topic>-<purpose>.html`. That's outside your repos, so pages never get
 committed by accident. Your browser choice is saved in `~/webme/.browser`.
+
+### Open list and retiring a page
+
+Each conversation keeps an **open list** in `~/webme/.open/<session-id>.txt`,
+one page path per line. On resume the hook reopens exactly the pages on that
+list (lines for files that no longer exist are dropped), and the agent keeps
+only those pages in sync. **Retiring** a page removes its line: it stops
+reopening, but the file stays on disk until the 14-day expiry. Conversations
+from before 1.1.0 have no list; the hook falls back to scanning the transcript.
 
 ### Living pages and snapshot pages
 
@@ -101,7 +111,7 @@ the agent matches later requests to the right page.
 - A page stays active for the **whole conversation**.
 - **`/clear` or a new conversation ends the topic.** Old pages are never edited
   again. If you want one back, the agent builds a new page from it.
-- Pages expire **14 days** after their last change (the hook deletes them).
+- Pages and open lists expire **14 days** after their last change (the hook deletes them).
 
 ### What a summary page contains
 

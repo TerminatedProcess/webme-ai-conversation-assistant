@@ -93,8 +93,33 @@ Claude's tab group, so Claude can't see or switch to it.
 3. **Build it from the whole conversation so far** (living), or from the
    data the request names (snapshot).
 4. **Open it once** in the saved browser (table above).
-5. **Renaming a page:** after `mv`, make one Edit to the new file so its path
-   is in the transcript. The resume hook finds pages from that.
+5. **Add it to the open list** (next section).
+
+## The open list: which pages are live
+
+Each conversation has an **open list**, `~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt`:
+one absolute page path per line. It decides which pages the resume hook
+reopens and which pages you keep in sync. (`$CLAUDE_CODE_SESSION_ID` is set in
+Claude's Bash tool.)
+
+- **Creating a page:** append its absolute path (no duplicates; create the
+  dir/file if missing):
+  ```bash
+  f=~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt; p=/abs/path/webme-x.html; mkdir -p "${f%/*}"; grep -qxF "$p" "$f" 2>/dev/null || echo "$p" >> "$f"
+  ```
+- **Renaming a page:** after `mv`, replace its line:
+  ```bash
+  f=~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt; sed -i.bak "s|^$old\$|$new|" "$f" && rm -f "$f.bak"   # $old, $new = absolute paths
+  ```
+- **Retire** ("retire / close / drop / stop showing that page", "I read it"):
+  remove its line only. The file stays on disk and still expires with the
+  14-day retention. **Never delete a page unless the user explicitly says
+  delete.**
+  ```bash
+  f=~/webme/.open/$CLAUDE_CODE_SESSION_ID.txt; p=/abs/path/webme-x.html; grep -vxF "$p" "$f" > "$f.tmp"; mv "$f.tmp" "$f"
+  ```
+- Conversations from before 1.1.0 have no list; the hook then scans the
+  transcript. Create the list the first time you touch a page.
 
 ## Checking a page yourself (screenshot)
 
@@ -120,9 +145,10 @@ continued (they expire after 14 days).
 The session-start hook (`hooks/webme-session-start.sh`, installed with the
 Claude Code plugin; other agents can run it from their own session-start
 hook, or go without it):
-- **startup / clear:** deletes `~/webme/webme-*.html` older than 14 days. Nothing else.
-- **resume:** reopens all of this conversation's pages (living and snapshot) in the saved
-  browser and injects "webme is ACTIVE, pages: …".
+- **startup / clear:** deletes `~/webme/webme-*.html` and `~/webme/.open/*.txt` older than 14 days. Nothing else.
+- **resume:** reopens every page on this conversation's open list (living and snapshot) in the saved
+  browser and injects "webme is ACTIVE, pages: …" plus the open-list path.
+  Lines whose files no longer exist are dropped from the list.
 - **compact:** injects the same reminder only; the pages are already open.
 
 So when you see that reminder, keep updating those pages and don't reopen
@@ -130,7 +156,7 @@ them. No memory file is needed.
 
 ## Every turn while active
 
-**Keep every page of this conversation in sync.** Each turn, check all of
+**Keep every page on the open list in sync.** Each turn, check all of
 them, not just the one the request was about. If a fact, number or decision
 changes and another page shows it or is built from it, update that page in
 the same turn too. Example: the summary page records a new allocation figure,
